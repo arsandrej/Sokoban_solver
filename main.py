@@ -5,7 +5,7 @@ from solvers.dfs_solver import dfs_solver
 from level_loader import load_level
 
 
-level = load_level("levels/level4.txt")
+level = load_level("levels/frozen_test.txt")
 
 initial_state = SokobanState(level)
 

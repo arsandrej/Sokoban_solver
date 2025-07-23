@@ -47,6 +47,38 @@ class SokobanState:
     def is_goal(self):
         return self.boxes == self.goals
 
+    def is_frozen(self, x, y):
+        if self.is_wall(x+1, y) or self.is_wall(x-1, y):
+            for goal in self.goals:
+                if x == goal[0]:
+                    return False
+        if self.is_wall(x, y + 1) or self.is_wall(x, y - 1):
+            for goal in self.goals:
+                if y == goal[1]:
+                    return False
+        print("Frozen")
+        return True
+    def is_deadlocked(self):
+        for box in self.boxes:
+            if box in self.goals:
+                continue  #if its on goal it cant be deadlocked
+
+            x, y = box
+
+            #Check if box is in a corner -> it cant be pushed in any case scenario
+            if (
+                    (self.is_wall(x + 1, y) and self.is_wall(x, y + 1)) or
+                    (self.is_wall(x - 1, y) and self.is_wall(x, y + 1)) or
+                    (self.is_wall(x + 1, y) and self.is_wall(x, y - 1)) or
+                    (self.is_wall(x - 1, y) and self.is_wall(x, y - 1))
+            ):
+                print("Corner")
+                return True
+            if self.is_frozen(x, y):
+                return True
+
+        return False #No deadlocks detected
+
     def clone(self):
         new_state = SokobanState([''.join(row) for row in self.grid])
         new_state.player = self.player
@@ -74,7 +106,8 @@ class SokobanState:
                 new_state.grid[ny][nx] = "@"
                 new_state.player = (nx, ny)
                 new_state.boxes = new_state.find_boxes()
-                successors.append((direction, new_state))
+                if not new_state.is_deadlocked():
+                    successors.append((direction, new_state))
 
             # Move in box direction
             elif target == "$":
@@ -88,7 +121,8 @@ class SokobanState:
                     new_state.grid[by][bx] = "$"
                     new_state.player = (nx, ny)
                     new_state.boxes = new_state.find_boxes()
-                    successors.append((direction, new_state))
+                    if not new_state.is_deadlocked():
+                        successors.append((direction, new_state))
 
         return successors
 
