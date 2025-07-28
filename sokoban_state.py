@@ -155,6 +155,13 @@ class SokobanState:
 
         return successors
 
+    def heuristic(self):
+        # Sum of Manhattan distances from boxes to their closest goals
+        total = 0
+        for box in self.boxes:
+            total += min(abs(box[0] - goal[0]) + abs(box[1] - goal[1]) for goal in self.goals)
+        return total
+
     def __lt__(self, other):
         return (self.player, self.boxes) < (other.player, other.boxes)
 
