@@ -31,7 +31,7 @@ def draw_state(screen, state, images, offset_x=0, offset_y=0):
                 screen.blit(images["wall"], pos)
             elif (x, y) == state.player:
                 player_image = images["player"]
-                player_image_scaled = pygame.transform.scale(player_image, (50, 64))
+                player_image_scaled = pygame.transform.scale(player_image, (64, 64))
 
                 screen.blit(player_image_scaled, pos)
             elif (x, y) in state.goals and (x, y) in state.boxes:
