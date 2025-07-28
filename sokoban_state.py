@@ -5,8 +5,10 @@ DIRECTIONS = {
     'R': (1, 0),
 }
 
+import math
+
 class SokobanState:
-    def __init__(self, grid):
+    def __init__(self, grid, heuristic_type="manhattan"):
 
         self.grid = [list(row) for row in grid]
         self.height = len(self.grid)
@@ -14,6 +16,7 @@ class SokobanState:
         self.player = self.find_player()
         self.boxes = self.find_boxes()
         self.goals = self.find_goals()
+        self.heuristic_type = heuristic_type
 
     def find_player(self):
         for y in range(self.height):
@@ -156,11 +159,22 @@ class SokobanState:
         return successors
 
     def heuristic(self):
-        # Sum of Manhattan distances from boxes to their closest goals
-        total = 0
+        total_distance = 0
         for box in self.boxes:
-            total += min(abs(box[0] - goal[0]) + abs(box[1] - goal[1]) for goal in self.goals)
-        return total
+            if self.heuristic_type == "manhattan":
+                min_distance = min(
+                    abs(box[0] - goal[0]) + abs(box[1] - goal[1])
+                    for goal in self.goals
+                )
+            elif self.heuristic_type == "euclidean":
+                min_distance = min(
+                    math.sqrt((box[0] - goal[0]) ** 2 + (box[1] - goal[1]) ** 2)
+                    for goal in self.goals
+                )
+            else:
+                raise ValueError(f"Unknown heuristic: {self.heuristic_type}")
+            total_distance += min_distance
+        return total_distance
 
     def __lt__(self, other):
         return (self.player, self.boxes) < (other.player, other.boxes)
