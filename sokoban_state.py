@@ -48,16 +48,45 @@ class SokobanState:
         return self.boxes == self.goals
 
     def is_frozen(self, x, y):
-        if self.is_wall(x+1, y) or self.is_wall(x-1, y):
-            for goal in self.goals:
-                if x == goal[0]:
-                    return False
-        if self.is_wall(x, y + 1) or self.is_wall(x, y - 1):
-            for goal in self.goals:
-                if y == goal[1]:
-                    return False
-        print("Frozen")
-        return True
+
+        def is_blocked(x, y, axis):
+
+            if axis == 'horizontal':
+                directions = [(-1, 0), (1, 0)]
+            else:
+                directions = [(0, -1), (0, 1)]
+
+            visited = set()
+            queue = [(x, y)]
+
+            while queue:
+                bx, by = queue.pop()
+                visited.add((bx, by))
+
+                for dx, dy in directions:
+                    nx, ny = bx + dx, by + dy
+
+                    if self.is_wall(nx, ny):
+                        continue
+
+                    if (nx, ny) in self.boxes:
+                        if (nx, ny) not in visited:
+                            queue.append((nx, ny))
+                            break  # Need to investigate this box before deciding anything
+                    else:
+                        #Box not blocked since it can move
+                        return False
+
+            return True  #All paths are blocked
+
+        blocked_horizontally = is_blocked(x, y, 'horizontal')
+        blocked_vertically = is_blocked(x, y, 'vertical')
+
+        if blocked_horizontally and blocked_vertically:
+            return (x, y) not in self.goals #Check if its maybe on goal
+
+        return False
+
     def is_deadlocked(self):
         for box in self.boxes:
             if box in self.goals:
@@ -72,7 +101,7 @@ class SokobanState:
                     (self.is_wall(x + 1, y) and self.is_wall(x, y - 1)) or
                     (self.is_wall(x - 1, y) and self.is_wall(x, y - 1))
             ):
-                print("Corner")
+                # print("Corner")
                 return True
             if self.is_frozen(x, y):
                 return True
