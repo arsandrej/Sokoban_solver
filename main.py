@@ -10,15 +10,9 @@ from visualize import run_game
 level = load_level("levels/level2.txt")
 initial_state = SokobanState(level)
 
-run_solver("A*", astar_solver, initial_state)
-
-run_solver("BFS", bfs_solver, initial_state)
-
-run_solver("DFS", dfs_solver, initial_state)
-
-solution_astar = astar_solver(initial_state)
-solution_bfs = bfs_solver(initial_state)
-solution_dfs = dfs_solver(initial_state)
+solution_astar = run_solver("A*", astar_solver, initial_state)
+solution_bfs = run_solver("BFS", bfs_solver, initial_state)
+solution_dfs = run_solver("DFS", dfs_solver, initial_state)
 
 run_game(initial_state, solution_astar, solution_bfs, solution_dfs)
 

@@ -1,6 +1,9 @@
 from collections import deque
+import time
 
 def bfs_solver(initial_state):
+    start_time = time.time()
+    explored_nodes = 0
     visited = set()
     queue = deque()
 
@@ -10,9 +13,14 @@ def bfs_solver(initial_state):
 
     while queue:
         state, path = queue.popleft()
+        explored_nodes += 1
 
         if state.is_goal():
-            return path
+            end_time = time.time()
+            return path, {
+                "execution_time": end_time - start_time,
+                "explored_nodes": explored_nodes
+            }
 
         for move, successor in state.get_successors():
             h = hash(successor)
@@ -20,4 +28,7 @@ def bfs_solver(initial_state):
                 visited.add(h)
                 queue.append((successor, path + move))
 
-    return None  # Returns None if no solution is found.
+    return None, {
+        "execution_time": time.time() - start_time,
+        "explored_nodes": explored_nodes
+    }

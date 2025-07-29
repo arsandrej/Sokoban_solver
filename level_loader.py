@@ -14,13 +14,17 @@ def apply_solution(state, solution):
 
 def run_solver(name, solver_func, initial_state):
     print(f"--- {name} ---")
-    path = solver_func(initial_state)
+    path, stats = solver_func(initial_state)
     if path:
         print(f"{name} Solution: {path}")
         final_state = apply_solution(initial_state, path)
         print(f"Final {name} State:")
         print(final_state)
+        print(f"{name} Stats: Time = {stats['execution_time']:.4f}s, Explored Nodes = {stats['explored_nodes']}")
+
     else:
         print(f"No {name} solution found.")
+        print(f"{name} Stats: Time = {stats['execution_time']:.4f}s, Explored Nodes = {stats['explored_nodes']}")
+
     print()
     return path
