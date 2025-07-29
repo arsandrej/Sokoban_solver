@@ -7,7 +7,7 @@ from level_loader import run_solver
 from visualize import run_game
 
 
-level = load_level("levels/level2.txt")
+level = load_level("levels/level4.txt")
 initial_state = SokobanState(level)
 
 solution_astar = run_solver("A*", astar_solver, initial_state)

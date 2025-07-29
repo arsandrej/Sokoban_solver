@@ -29,7 +29,7 @@ class SokobanState:
         box = []
         for y in range(self.height):
             for x in range(self.width):
-                if self.grid[y][x] == "$":
+                if self.grid[y][x] == "$" or self.grid[y][x] == "*":
                     box.append((x, y))
         return set(box)
 
@@ -37,7 +37,7 @@ class SokobanState:
         goal = []
         for y in range(self.height):
             for x in range(self.width):
-                if self.grid[y][x] == ".":
+                if self.grid[y][x] == "." or self.grid[y][x] == "*":
                     goal.append((x, y))
         return set(goal)
 
@@ -174,6 +174,21 @@ class SokobanState:
             else:
                 raise ValueError(f"Unknown heuristic: {self.heuristic_type}")
             total_distance += min_distance
+
+        player_box_distance = 0
+        if self.boxes:
+            if self.heuristic_type == "manhattan":
+                player_box_distance = min(
+                    abs(self.player[0] - box[0]) + abs(self.player[1] - box[1])
+                    for box in self.boxes
+                )
+            elif self.heuristic_type == "euclidean":
+                player_box_distance = min(
+                    math.sqrt((self.player[0] - box[0]) ** 2 + (self.player[1] - box[1]) ** 2)
+                    for box in self.boxes
+                )
+
+            total_distance += 0.5 * player_box_distance #Adding the distance from the player to the box to prefer paths where he gets closer to the box
         return total_distance
 
     def __lt__(self, other):
