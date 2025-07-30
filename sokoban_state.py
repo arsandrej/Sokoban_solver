@@ -1,6 +1,7 @@
 from scipy.optimize import linear_sum_assignment
 import numpy as np
 import math
+from collections import deque
 
 DIRECTIONS = {
     'U': (0, -1),
@@ -20,6 +21,19 @@ class SokobanState:
         self.boxes = self.find_boxes()
         self.goals = self.find_goals()
         self.heuristic_type = heuristic_type
+        self.dead_squares = None
+        self.compute_dead_squares()
+        # self.print_dead_squares()
+
+    def print_dead_squares(self):
+        for y in range(self.height):
+            row = ""
+            for x in range(self.width):
+                if (x, y) in self.dead_squares:
+                    row += "X"
+                else:
+                    row += self.grid[y][x]
+            print(row)
 
     def find_player(self):
         for y in range(self.height):
@@ -53,43 +67,83 @@ class SokobanState:
     def is_goal(self):
         return self.boxes == self.goals
 
-    def is_frozen(self, x, y):
 
-        def is_blocked(x, y, axis):
+    def compute_dead_squares(self):
+        self.dead_squares = set()
 
-            if axis == 'horizontal':
-                directions = [(-1, 0), (1, 0)]
-            else:
-                directions = [(0, -1), (0, 1)]
+        for x in range(self.width):
+            # Top edge
+            if self.grid[0][x] != '#' and (x, 0) not in self.goals:
+                self.dead_squares.add((x, 0))
+            # Bottom edge
+            if self.grid[self.height - 1][x] != '#' and (x, self.height - 1) not in self.goals:
+                self.dead_squares.add((x, self.height - 1))
 
-            visited = set()
-            queue = [(x, y)]
+        for y in range(self.height):
+            # Left edge
+            if self.grid[y][0] != '#' and (0, y) not in self.goals:
+                self.dead_squares.add((0, y))
+            # Right edge
+            if self.grid[y][self.width - 1] != '#' and (self.width - 1, y) not in self.goals:
+                self.dead_squares.add((self.width - 1, y))
 
-            while queue:
-                bx, by = queue.pop()
-                visited.add((bx, by))
+    def is_free(self, x, y):
+        return (not self.is_wall(x, y)) and ((x, y) not in self.boxes) # Helper to check if cell is empty
 
-                for dx, dy in directions:
-                    nx, ny = bx + dx, by + dy
+    def is_frozen(self):
+        # Initially: boxes on goals are NOT frozen
+        frozen = {box: False for box in self.boxes}
+        for box in self.boxes:
+            if box in self.goals:
+                frozen[box] = False
 
-                    if self.is_wall(nx, ny):
+        changed = True
+        while changed:
+            changed = False
+
+            for box in self.boxes:
+                if frozen[box]:
+                    continue  # Already frozen
+
+                x, y = box
+                movable = False
+
+                for dx, dy in DIRECTIONS.values():
+                    dest = (x + dx, y + dy)
+                    behind = (x - dx, y - dy)
+
+                    # Check bounds
+                    if not self.is_inside_bounds(*dest) or not self.is_inside_bounds(*behind):
                         continue
 
-                    if (nx, ny) in self.boxes:
-                        if (nx, ny) not in visited:
-                            queue.append((nx, ny))
-                            break  # Need to investigate this box before deciding anything
+                    # Destination must be free (no wall, no box)
+                    if not self.is_free(*dest):
+                        continue
+
+                    # Player must stand behind box (behind cell)
+                    if self.is_wall(*behind):
+                        continue
+
+                    if behind in self.boxes:
+                        # Box behind must NOT be frozen for current box to be movable
+                        if frozen.get(behind, True):
+                            continue
+                        else:
+                            movable = True
+                            break
                     else:
-                        #Box not blocked since it can move
-                        return False
+                        # Behind cell is free floor/goal for player to stand
+                        movable = True
+                        break
 
-            return True  #All paths are blocked
+                if not movable:
+                    frozen[box] = True
+                    changed = True
 
-        blocked_horizontally = is_blocked(x, y, 'horizontal')
-        blocked_vertically = is_blocked(x, y, 'vertical')
-
-        if blocked_horizontally and blocked_vertically:
-            return (x, y) not in self.goals #Check if its maybe on goal
+        # If any box off goal is frozen, then freeze deadlock exists
+        for box in self.boxes:
+            if box not in self.goals and frozen[box]:
+                return True
 
         return False
 
@@ -97,9 +151,10 @@ class SokobanState:
         for box in self.boxes:
             if box in self.goals:
                 continue  #if its on goal it cant be deadlocked
+            if box in self.dead_squares:
+                return True
 
             x, y = box
-
             #Check if box is in a corner -> it cant be pushed in any case scenario
             if (
                     (self.is_wall(x + 1, y) and self.is_wall(x, y + 1)) or
@@ -109,8 +164,10 @@ class SokobanState:
             ):
                 # print("Corner")
                 return True
-            # if self.is_frozen(x, y):
-            #     return True
+
+        #
+        if self.is_frozen():
+            return True
 
         return False #No deadlocks detected
 
@@ -119,6 +176,7 @@ class SokobanState:
         new_state.player = self.player
         new_state.boxes = self.boxes.copy()
         new_state.goals = self.goals.copy()
+        new_state.dead_squares = self.dead_squares
         return new_state
 
     def get_successors(self):
@@ -141,8 +199,8 @@ class SokobanState:
                 new_state.grid[ny][nx] = "@"
                 new_state.player = (nx, ny)
                 new_state.boxes = new_state.find_boxes()
-                if not new_state.is_deadlocked():
-                    successors.append((direction, new_state))
+
+                successors.append((direction, new_state))
 
             # Move in box direction
             elif target == "$":
