@@ -59,51 +59,76 @@ def run_game(initial_state, astar_solution, bfs_solution, dfs_solution):
         "DFS": pygame.Rect(190, SCREEN_HEIGHT - BUTTON_HEIGHT - 10, 80, BUTTON_HEIGHT),
     }
 
+    offset_x = (SCREEN_WIDTH - initial_state.width * TILE_SIZE) // 2
+    offset_y = (SCREEN_HEIGHT - initial_state.height * TILE_SIZE - 60) // 2
+
+    clock = pygame.time.Clock()
+    animation_running = False
+    animation_solution = ""
+    animation_index = 0
+    current_state = initial_state
+    animation_timer = 0
+    animation_delay = 300
+
     def draw_buttons():
         for text, rect in buttons.items():
             pygame.draw.rect(screen, (180, 180, 180), rect)
             label = font.render(text, True, (0, 0, 0))
             screen.blit(label, (rect.x + 10, rect.y + 10))
 
-    def animate_solution(state, solution):
-        current = state
-        draw_state(screen, current, images, offset_x=offset_x, offset_y=offset_y)
-        time.sleep(0.3)
-
-        for move in solution:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
-
-            for direction, next_state in current.get_successors():
-                if direction == move:
-                    current = next_state
-                    break
-
-            draw_state(screen, current, images, offset_x=offset_x, offset_y=offset_y)
-            time.sleep(0.3)
-
-    offset_x = (SCREEN_WIDTH - initial_state.width * TILE_SIZE) // 2
-    offset_y = (SCREEN_HEIGHT - initial_state.height * TILE_SIZE - 60) // 2
-
     running = True
     while running:
-        screen.fill((0, 0, 0))
-        draw_state(screen, initial_state, images, offset_x=offset_x, offset_y=offset_y)
-        draw_buttons()
-        pygame.display.flip()
+        dt = clock.tick(60)
+        animation_timer += dt
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN and not animation_running:
                 if buttons["A*"].collidepoint(event.pos):
-                    animate_solution(initial_state, astar_solution)
+                    animation_solution = astar_solution
+                    animation_running = True
+                    animation_index = 0
+                    current_state = initial_state
+                    animation_timer = 0
+
                 elif buttons["BFS"].collidepoint(event.pos):
-                    animate_solution(initial_state, bfs_solution)
+                    animation_solution = bfs_solution
+                    animation_running = True
+                    animation_index = 0
+                    current_state = initial_state
+                    animation_timer = 0
+
                 elif buttons["DFS"].collidepoint(event.pos):
-                    animate_solution(initial_state, dfs_solution)
+                    animation_solution = dfs_solution
+                    animation_running = True
+                    animation_index = 0
+                    current_state = initial_state
+                    animation_timer = 0
+
+        # Draw everything
+        screen.fill((0, 0, 0))
+        draw_state(screen, current_state, images, offset_x=offset_x, offset_y=offset_y)
+        draw_buttons()
+
+        # Animate moves
+        if animation_running and animation_index < len(animation_solution):
+            if animation_timer >= animation_delay:
+                move = animation_solution[animation_index]
+                # Update current_state with next move
+                for direction, next_state in current_state.get_successors():
+                    if direction == move:
+                        current_state = next_state
+                        break
+
+                animation_index += 1
+                animation_timer = 0  # reset timer
+
+        elif animation_running:
+            # Animation finished
+            animation_running = False
+
+        pygame.display.flip()
 
     pygame.quit()
