@@ -1,3 +1,7 @@
+from scipy.optimize import linear_sum_assignment
+import numpy as np
+import math
+
 DIRECTIONS = {
     'U': (0, -1),
     'D': (0, 1),
@@ -5,7 +9,6 @@ DIRECTIONS = {
     'R': (1, 0),
 }
 
-import math
 
 class SokobanState:
     def __init__(self, grid, heuristic_type="manhattan"):
@@ -106,8 +109,8 @@ class SokobanState:
             ):
                 # print("Corner")
                 return True
-            if self.is_frozen(x, y):
-                return True
+            # if self.is_frozen(x, y):
+            #     return True
 
         return False #No deadlocks detected
 
@@ -159,36 +162,39 @@ class SokobanState:
         return successors
 
     def heuristic(self):
-        total_distance = 0
-        for box in self.boxes:
-            if self.heuristic_type == "manhattan":
-                min_distance = min(
-                    abs(box[0] - goal[0]) + abs(box[1] - goal[1])
-                    for goal in self.goals
-                )
-            elif self.heuristic_type == "euclidean":
-                min_distance = min(
-                    math.sqrt((box[0] - goal[0]) ** 2 + (box[1] - goal[1]) ** 2)
-                    for goal in self.goals
-                )
-            else:
-                raise ValueError(f"Unknown heuristic: {self.heuristic_type}")
-            total_distance += min_distance
+        num_boxes = len(self.boxes)
+        num_goals = len(self.goals)
 
-        player_box_distance = 0
-        if self.boxes:
-            if self.heuristic_type == "manhattan":
-                player_box_distance = min(
-                    abs(self.player[0] - box[0]) + abs(self.player[1] - box[1])
-                    for box in self.boxes
-                )
-            elif self.heuristic_type == "euclidean":
-                player_box_distance = min(
-                    math.sqrt((self.player[0] - box[0]) ** 2 + (self.player[1] - box[1]) ** 2)
-                    for box in self.boxes
-                )
 
-            total_distance += 0.5 * player_box_distance #Adding the distance from the player to the box to prefer paths where he gets closer to the box
+        cost_matrix = np.zeros((num_boxes, num_goals)) # Matrix of of cost (boxes x goals)
+
+        for i, box in enumerate(self.boxes):
+            for j, goal in enumerate(self.goals):
+                if self.heuristic_type == "manhattan":
+                    dist = abs(box[0] - goal[0]) + abs(box[1] - goal[1])
+                elif self.heuristic_type == "euclidean":
+                    dist = math.hypot(box[0] - goal[0], box[1] - goal[1])
+                else:
+                    raise ValueError(f"Unknown heuristic: {self.heuristic_type}")
+                cost_matrix[i][j] = dist  # Add values to matrix
+
+        row_ind, col_ind = linear_sum_assignment(cost_matrix) # Find the optimal assignment of boxes to unique goals using the Hungarian algorithm
+
+        distances = cost_matrix[row_ind, col_ind]
+        total_distance = distances.sum()
+
+
+        max_distance = distances.max() # Farthest box to goal distance
+        total_distance += 0.2 * max_distance  # Weight far boxes more
+
+
+        player_box_distance = min(
+            abs(self.player[0] - box[0]) + abs(self.player[1] - box[1]) #Add the distance from player to closest box to encourage movement towards boxes
+            for box in self.boxes
+        )
+        total_distance += 0.5 * player_box_distance  # Weighted influence
+        #Using higher weight seems to slightly improve in exploring the solution
+
         return total_distance
 
     def __lt__(self, other):
