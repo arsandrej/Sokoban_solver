@@ -27,4 +27,4 @@ def run_solver(name, solver_func, initial_state):
         print(f"{name} Stats: Time = {stats['execution_time']:.4f}s, Explored Nodes = {stats['explored_nodes']}")
 
     print()
-    return path
+    return path, stats

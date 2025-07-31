@@ -45,7 +45,12 @@ def draw_state(screen, state, images, offset_x=0, offset_y=0):
 
     pygame.display.flip()
 
-def run_game(initial_state, astar_solution, bfs_solution, dfs_solution):
+def run_game(initial_state,
+             astar_solution, astar_stats,
+             bfs_solution, bfs_stats,
+             dfs_solution, dfs_stats):
+    current_stats = None
+
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Sokoban Solver Visualization")
@@ -76,6 +81,16 @@ def run_game(initial_state, astar_solution, bfs_solution, dfs_solution):
             label = font.render(text, True, (0, 0, 0))
             screen.blit(label, (rect.x + 10, rect.y + 10))
 
+    def draw_stats():
+        if current_stats is None:
+            return
+
+        time_text = font.render(f"Time: {current_stats['execution_time']:.4f} s", True, (255, 255, 255))
+        nodes_text = font.render(f"Explored Nodes: {current_stats['explored_nodes']}", True, (255, 255, 255))
+
+        screen.blit(time_text, (10, 10))
+        screen.blit(nodes_text, (10, 40))
+
     running = True
     while running:
         dt = clock.tick(60)
@@ -87,6 +102,7 @@ def run_game(initial_state, astar_solution, bfs_solution, dfs_solution):
 
             elif event.type == pygame.MOUSEBUTTONDOWN and not animation_running:
                 if buttons["A*"].collidepoint(event.pos):
+                    current_stats = astar_stats
                     animation_solution = astar_solution
                     animation_running = True
                     animation_index = 0
@@ -94,6 +110,7 @@ def run_game(initial_state, astar_solution, bfs_solution, dfs_solution):
                     animation_timer = 0
 
                 elif buttons["BFS"].collidepoint(event.pos):
+                    current_stats = bfs_stats
                     animation_solution = bfs_solution
                     animation_running = True
                     animation_index = 0
@@ -101,6 +118,7 @@ def run_game(initial_state, astar_solution, bfs_solution, dfs_solution):
                     animation_timer = 0
 
                 elif buttons["DFS"].collidepoint(event.pos):
+                    current_stats = dfs_stats
                     animation_solution = dfs_solution
                     animation_running = True
                     animation_index = 0
@@ -111,6 +129,7 @@ def run_game(initial_state, astar_solution, bfs_solution, dfs_solution):
         screen.fill((0, 0, 0))
         draw_state(screen, current_state, images, offset_x=offset_x, offset_y=offset_y)
         draw_buttons()
+        draw_stats()
 
         # Animate moves
         if animation_running and animation_index < len(animation_solution):
