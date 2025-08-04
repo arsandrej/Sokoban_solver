@@ -43,8 +43,6 @@ def draw_state(screen, state, images, offset_x=0, offset_y=0):
                 screen.blit(images["box"], pos)
 
 
-    pygame.display.flip()
-
 def run_game(initial_state,
              astar_solution, astar_stats,
              bfs_solution, bfs_stats,
@@ -73,7 +71,7 @@ def run_game(initial_state,
     animation_index = 0
     current_state = initial_state
     animation_timer = 0
-    animation_delay = 300
+    animation_delay = 250
 
     def draw_buttons():
         for text, rect in buttons.items():
@@ -85,11 +83,39 @@ def run_game(initial_state,
         if current_stats is None:
             return
 
+        title = font.render(f"Statistics", True, (255, 255, 255))
         time_text = font.render(f"Time: {current_stats['execution_time']:.4f} s", True, (255, 255, 255))
         nodes_text = font.render(f"Explored Nodes: {current_stats['explored_nodes']}", True, (255, 255, 255))
+        steps_text = font.render(f"Steps: {len(animation_solution)}", True, (255, 255, 255))
 
-        screen.blit(time_text, (10, 10))
-        screen.blit(nodes_text, (10, 40))
+        screen.blit(title, (10, 10))
+        screen.blit(time_text, (10, 40))
+        screen.blit(nodes_text, (10, 70))
+        screen.blit(steps_text, (10, 100))
+
+    def draw_solution_banner():
+        if not animation_solution:
+            return
+
+        # Wrap solution string into chunks
+        chars_per_line = 70
+        lines = [animation_solution[i:i + chars_per_line] for i in range(0, len(animation_solution), chars_per_line)]
+
+        line_height = 36
+        padding = 10
+        banner_height = line_height * len(lines) + padding * 2
+
+        # Draw red background banner at bottom above the buttons
+        banner_top = SCREEN_HEIGHT - BUTTON_HEIGHT - banner_height - 20
+        banner_rect = pygame.Rect(0, banner_top, SCREEN_WIDTH, banner_height)
+        pygame.draw.rect(screen, (200, 0, 0), banner_rect)
+
+        # Draw each line centered
+        for i, line in enumerate(lines):
+            label = font.render(line, True, (255, 255, 255))
+            label_rect = label.get_rect(
+                center=(SCREEN_WIDTH // 2, banner_top + padding + i * line_height + line_height // 2))
+            screen.blit(label, label_rect)
 
     running = True
     while running:
@@ -130,6 +156,7 @@ def run_game(initial_state,
         draw_state(screen, current_state, images, offset_x=offset_x, offset_y=offset_y)
         draw_buttons()
         draw_stats()
+        draw_solution_banner()
 
         # Animate moves
         if animation_running and animation_index < len(animation_solution):
