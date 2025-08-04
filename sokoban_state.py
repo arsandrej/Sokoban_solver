@@ -124,10 +124,39 @@ class SokobanState:
             return True
         return False
 
+    def freeze_deadlock(self):
+        for x, y in self.boxes:
+            # Skip if on goal
+            if (x, y) in self.goals:
+                continue
+
+            # Horizontal pair (x, y) and (x+1, y)
+            if (x + 1, y) in self.boxes and (x + 1, y) not in self.goals:
+                # Check if both boxes are against top or bottom wall
+                top_wall = self.is_wall(x, y - 1) and self.is_wall(x + 1, y - 1)
+                bottom_wall = self.is_wall(x, y + 1) and self.is_wall(x + 1, y + 1)
+
+                if top_wall or bottom_wall:
+                    return True
+
+            # Vertical pair (x, y) and (x, y+1)
+            if (x, y + 1) in self.boxes and (x, y + 1) not in self.goals:
+                # Check if both boxes are against left or right wall
+                left_wall = self.is_wall(x - 1, y) and self.is_wall(x - 1, y + 1)
+                right_wall = self.is_wall(x + 1, y) and self.is_wall(x + 1, y + 1)
+
+                if left_wall or right_wall:
+                    return True
+
+        return False
+
     def is_deadlocked(self):
         for box in self.boxes:
             if box in self.dead_squares:
                 return True
+        if self.freeze_deadlock():
+            return True
+
         return False
 
     def clone(self):
@@ -144,7 +173,7 @@ class SokobanState:
         px, py = self.player
 
         for direction, (dx, dy) in DIRECTIONS.items():
-            nx, ny = px + dx, py + dy      # Adjacent tile
+            nx, ny = px + dx, py + dy # Adjacent tile
             bx, by = px + 2*dx, py + 2*dy  # Beyond box tile
 
             if not self.is_inside_bounds(nx, ny):
@@ -200,17 +229,8 @@ class SokobanState:
         distances = cost_matrix[row_ind, col_ind]
         total_distance = distances.sum()
 
-
         max_distance = distances.max() # Farthest box to goal distance
         total_distance += 0.2 * max_distance  # Weight far boxes more
-
-        list_g = list(self.goals)
-
-        push_cost = 0
-        for i, box in enumerate(self.boxes):
-            nearest_goal = list_g[col_ind[i]]
-            push_cost += self.estimate_push_distance(box, nearest_goal)
-        total_distance += push_cost*0.3
 
         player_box_distance = min(
             abs(self.player[0] - box[0]) + abs(self.player[1] - box[1]) #Add the distance from player to closest box to encourage movement towards boxes
@@ -221,19 +241,16 @@ class SokobanState:
 
         return total_distance
 
-    def estimate_push_distance(self, box, goal):
-        return abs(box[0] - goal[0]) + abs(box[1] - goal[1])#Estimates number of pushes needed to move box to goal
-
     def __lt__(self, other):
         return (self.player, self.boxes) < (other.player, other.boxes)
 
     def __hash__(self):
-        return hash((self.player, frozenset(self.boxes)))
+        # Use sorted boxes for invariant state representation
+        return hash((self.player, tuple(sorted(self.boxes))))
 
     def __eq__(self, other):
-        return isinstance(other, SokobanState) and \
-               self.player == other.player and \
-               self.boxes == other.boxes
+        return (self.player == other.player and
+                sorted(self.boxes) == sorted(other.boxes))
 
     def __str__(self):
         display = [row.copy() for row in self.grid]
