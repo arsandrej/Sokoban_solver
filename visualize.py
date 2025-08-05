@@ -1,6 +1,7 @@
 import pygame
 from level_loader import load_images
 from state_display import *
+from you_win import you_win
 
 def run_game(initial_state,
              astar_solution, astar_stats,
@@ -30,13 +31,26 @@ def run_game(initial_state,
     animation_index = 0
     current_state = initial_state
     animation_timer = 0
-    animation_delay = 250
+    win_delay_timer = 0
+    win_delay_duration = 1000
+
+    speed_button_rect = pygame.Rect(SCREEN_WIDTH - 180, 20, 160, 40)
+    ai_speed_fast = False
+    base_ai_delay = 300
+    animation_delay = base_ai_delay
+
 
     def draw_buttons():
         for text, rect in buttons.items():
             pygame.draw.rect(screen, (180, 180, 180), rect)
             label = font.render(text, True, (0, 0, 0))
             screen.blit(label, (rect.x + 10, rect.y + 10))
+        # Draw Speed Button
+        pygame.draw.rect(screen, (140, 100, 200), speed_button_rect)
+        speed_label = "2x Speed: ON" if ai_speed_fast else "2x Speed: OFF"
+        speed_text = font.render(speed_label, True, (255, 255, 255))
+        speed_text_rect = speed_text.get_rect(center=speed_button_rect.center)
+        screen.blit(speed_text, speed_text_rect)
 
     def draw_stats():
         if current_stats is None:
@@ -51,7 +65,7 @@ def run_game(initial_state,
         screen.blit(steps_text, (10, 90))
 
     def draw_solution_banner():
-        if not animation_solution:
+        if not animation_solution or animation_solution == dfs_solution:
             return
 
         chars_per_line = 70
@@ -71,6 +85,7 @@ def run_game(initial_state,
                 center=(SCREEN_WIDTH // 2, banner_top + padding + i * line_height + line_height // 2))
             screen.blit(label, label_rect)
 
+    show_you_win = False
     running = True
     while running:
         dt = clock.tick(60)
@@ -79,8 +94,23 @@ def run_game(initial_state,
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if show_you_win:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                    elif event.key == pygame.K_r:  # Reset game
+                        current_state = initial_state
+                        animation_running = False
+                        animation_solution = ""
+                        animation_index = 0
+                        current_stats = None
+                        show_you_win = False
 
-            elif event.type == pygame.MOUSEBUTTONDOWN and not animation_running:
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if speed_button_rect.collidepoint(event.pos):
+                    ai_speed_fast = not ai_speed_fast
+                    animation_delay = base_ai_delay // 2 if ai_speed_fast else base_ai_delay
+
                 if buttons["A*"].collidepoint(event.pos):
                     current_stats = astar_stats
                     animation_solution = astar_solution
@@ -106,27 +136,39 @@ def run_game(initial_state,
                     animation_timer = 0
 
         # Draw everything
+
         screen.fill((0, 0, 0))
-        draw_state(screen, current_state, images, offset_x=offset_x, offset_y=offset_y)
-        draw_buttons()
-        draw_stats()
-        draw_solution_banner()
 
-        # Animate moves
-        if animation_running and animation_index < len(animation_solution):
-            if animation_timer >= animation_delay:
-                move = animation_solution[animation_index]
-                # Update current_state with next move
-                for direction, next_state in current_state.get_successors():
-                    if direction == move:
-                        current_state = next_state
-                        break
+        if not show_you_win:
+            draw_state(screen, current_state, images, offset_x=offset_x, offset_y=offset_y)
+            draw_buttons()
+            draw_stats()
+            draw_solution_banner()
 
-                animation_index += 1
-                animation_timer = 0
+            # Animate moves
+            if animation_running:
+                if animation_index < len(animation_solution):
+                    if animation_timer >= animation_delay:
+                        move = animation_solution[animation_index]
+                        for direction, next_state in current_state.get_successors():
+                            if direction == move:
+                                current_state = next_state
+                                break
+                        animation_index += 1
+                        animation_timer = 0
+                else:
+                    # All moves done, check goal
+                    if current_state.is_goal():
+                        win_delay_timer += dt
+                        if win_delay_timer >= win_delay_duration:
+                            animation_running = False
+                            show_you_win = True
 
-        elif animation_running:
-            animation_running = False
+                    else:
+                        animation_running = False
+
+        else:
+            you_win(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
 
         pygame.display.flip()
 

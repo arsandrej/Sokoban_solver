@@ -35,7 +35,7 @@ def run_solver(name, solver_func, initial_state):
         final_state = apply_solution(initial_state, path)
         print(f"Final {name} State:")
         print(final_state)
-        print(f"{name} Stats: Time = {stats['execution_time']:.4f}s, Explored Nodes = {stats['explored_nodes']}")
+        print(f"{name} Stats: Time = {stats['execution_time']:.4f}s, Explored Nodes = {stats['explored_nodes']}, Steps: {len(path)}")
 
     else:
         print(f"No {name} solution found.")
