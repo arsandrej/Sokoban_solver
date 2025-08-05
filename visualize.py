@@ -1,47 +1,6 @@
 import pygame
-import time
-import os
-
-TILE_SIZE = 64
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 800
-FONT_SIZE = 24
-BUTTON_HEIGHT = 40
-
-# Load images once globally
-def load_images():
-    base_path = "images"
-    return {
-        "wall": pygame.image.load(os.path.join(base_path, "wall.png")),
-        "goal": pygame.image.load(os.path.join(base_path, "goal.png")),
-        "box": pygame.image.load(os.path.join(base_path, "box.png")),
-        "box_on_goal": pygame.image.load(os.path.join(base_path, "box_on_goal.png")),
-        "player": pygame.image.load(os.path.join(base_path, "player.png")),
-        "floor": pygame.image.load(os.path.join(base_path, "floor.png")),
-    }
-
-def draw_state(screen, state, images, offset_x=0, offset_y=0):
-    for y, row in enumerate(state.grid):
-        for x, _ in enumerate(row):
-            pos = (offset_x + x * TILE_SIZE, offset_y + y * TILE_SIZE)
-
-            screen.blit(images["floor"], pos)
-
-            if state.is_wall(x, y):
-                screen.blit(images["wall"], pos)
-            elif (x, y) == state.player:
-                player_image = images["player"]
-                player_image_scaled = pygame.transform.scale(player_image, (64, 64))
-                screen.blit(player_image_scaled, pos)
-            elif (x, y) in state.goals and (x, y) in state.boxes:
-                screen.blit(images["box_on_goal"], pos)
-            elif (x, y) in state.goals:
-                goal_offset = (16, 16)
-                goal_pos = (pos[0] + goal_offset[0], pos[1] + goal_offset[1])
-                screen.blit(images["goal"], goal_pos)
-            elif (x, y) in state.boxes:
-                screen.blit(images["box"], pos)
-
+from level_loader import load_images
+from state_display import *
 
 def run_game(initial_state,
              astar_solution, astar_stats,
@@ -83,21 +42,18 @@ def run_game(initial_state,
         if current_stats is None:
             return
 
-        title = font.render(f"Statistics", True, (255, 255, 255))
         time_text = font.render(f"Time: {current_stats['execution_time']:.4f} s", True, (255, 255, 255))
         nodes_text = font.render(f"Explored Nodes: {current_stats['explored_nodes']}", True, (255, 255, 255))
         steps_text = font.render(f"Steps: {len(animation_solution)}", True, (255, 255, 255))
 
-        screen.blit(title, (10, 10))
-        screen.blit(time_text, (10, 40))
-        screen.blit(nodes_text, (10, 70))
-        screen.blit(steps_text, (10, 100))
+        screen.blit(time_text, (10, 10))
+        screen.blit(nodes_text, (10, 50))
+        screen.blit(steps_text, (10, 90))
 
     def draw_solution_banner():
         if not animation_solution:
             return
 
-        # Wrap solution string into chunks
         chars_per_line = 70
         lines = [animation_solution[i:i + chars_per_line] for i in range(0, len(animation_solution), chars_per_line)]
 
@@ -105,12 +61,10 @@ def run_game(initial_state,
         padding = 10
         banner_height = line_height * len(lines) + padding * 2
 
-        # Draw red background banner at bottom above the buttons
         banner_top = SCREEN_HEIGHT - BUTTON_HEIGHT - banner_height - 20
         banner_rect = pygame.Rect(0, banner_top, SCREEN_WIDTH, banner_height)
         pygame.draw.rect(screen, (200, 0, 0), banner_rect)
 
-        # Draw each line centered
         for i, line in enumerate(lines):
             label = font.render(line, True, (255, 255, 255))
             label_rect = label.get_rect(
@@ -169,10 +123,9 @@ def run_game(initial_state,
                         break
 
                 animation_index += 1
-                animation_timer = 0  # reset timer
+                animation_timer = 0
 
         elif animation_running:
-            # Animation finished
             animation_running = False
 
         pygame.display.flip()
