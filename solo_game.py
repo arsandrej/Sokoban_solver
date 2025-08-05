@@ -16,7 +16,7 @@ def run_solo_game(initial_state, astar_solver_func):
     offset_x = (SCREEN_WIDTH - initial_state.width * TILE_SIZE) // 2
     offset_y = (SCREEN_HEIGHT - initial_state.height * TILE_SIZE - 60) // 2
 
-    current_state = initial_state
+    current_state = initial_state.clone()
     move_stack = []
     redo_stack = []
     steps = 0
@@ -31,6 +31,13 @@ def run_solo_game(initial_state, astar_solver_func):
     ai_animation_timer = 0
     ai_solve_time = 0
 
+    button_width = 160
+    button_height = 40
+    button_x = SCREEN_WIDTH - button_width - 20
+    button_y = 20
+    ai_button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
+    reset_button_rect = pygame.Rect(SCREEN_WIDTH - button_width - 20, 70, button_width, button_height)
+
     while True:
         dt = clock.tick(60)
         ai_animation_timer += dt
@@ -40,43 +47,58 @@ def run_solo_game(initial_state, astar_solver_func):
                 pygame.quit()
                 return
 
-            if not ai_solving and event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    return
+            if not ai_solving:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        return
 
-                if event.key in (pygame.K_UP, pygame.K_w):
-                    move = 'U'
-                elif event.key in (pygame.K_DOWN, pygame.K_s):
-                    move = 'D'
-                elif event.key in (pygame.K_LEFT, pygame.K_a):
-                    move = 'L'
-                elif event.key in (pygame.K_RIGHT, pygame.K_d):
-                    move = 'R'
-                else:
-                    move = None
+                    if event.key in (pygame.K_UP, pygame.K_w):
+                        move = 'U'
+                    elif event.key in (pygame.K_DOWN, pygame.K_s):
+                        move = 'D'
+                    elif event.key in (pygame.K_LEFT, pygame.K_a):
+                        move = 'L'
+                    elif event.key in (pygame.K_RIGHT, pygame.K_d):
+                        move = 'R'
+                    else:
+                        move = None
 
-                if move:
-                    for direction, next_state in current_state.get_successors():
-                        if direction == move:
-                            move_stack.append(current_state)
-                            redo_stack.clear()
-                            current_state = next_state
-                            steps += 1
-                            break
+                    if move:
+                        for direction, next_state in current_state.get_successors():
+                            if direction == move:
+                                move_stack.append(current_state)
+                                redo_stack.clear()
+                                current_state = next_state
+                                steps += 1
+                                break
 
-                if event.key == pygame.K_a:
-                    player_time_running = False
-                    ai_solution, ai_stats = astar_solver_func(current_state)
-                    ai_solve_time = ai_stats['execution_time'] if ai_stats else 0
-                    if ai_solution:
-                        ai_solving = True
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if ai_button_rect.collidepoint(event.pos): # Solve with Ai
+                        player_time_running = False
+                        ai_solution, ai_stats = astar_solver_func(current_state)
+                        ai_solve_time = ai_stats['execution_time'] if ai_stats else 0
+                        if ai_solution:
+                            ai_solving = True
+                            ai_solution_index = 0
+                            ai_animation_timer = 0
+                    elif reset_button_rect.collidepoint(event.pos):# Reset game state
+
+                        current_state = initial_state.clone()
+                        move_stack.clear()
+                        redo_stack.clear()
+                        steps = 0
+                        ai_solving = False
+                        ai_solution = ""
                         ai_solution_index = 0
-                        ai_animation_timer = 0
+                        ai_solve_time = 0
+                        start_time = time.time()
+                        player_time_running = True
 
         screen.fill((0, 0, 0))
         draw_state(screen, current_state, images, offset_x, offset_y)
 
+        # Draw step and time text
         steps_text = font.render(f"Steps: {steps}", True, (255, 255, 255))
         screen.blit(steps_text, (10, 10))
 
@@ -87,6 +109,18 @@ def run_solo_game(initial_state, astar_solver_func):
             elapsed = time.time() - start_time if player_time_running else 0
             player_time_text = font.render(f"Player time: {elapsed:.2f} s", True, (255, 255, 255))
             screen.blit(player_time_text, (10, 40))
+
+        #Solve Ai button
+        pygame.draw.rect(screen, (70, 130, 180), ai_button_rect)
+        button_text = font.render("Solve with AI", True, (255, 255, 255))
+        text_rect = button_text.get_rect(center=ai_button_rect.center)
+        screen.blit(button_text, text_rect)
+
+        # Draw Reset button
+        pygame.draw.rect(screen, (180, 70, 70), reset_button_rect)
+        reset_text = font.render("Reset", True, (255, 255, 255))
+        reset_text_rect = reset_text.get_rect(center=reset_button_rect.center)
+        screen.blit(reset_text, reset_text_rect)
 
         if ai_solving and ai_solution:
             if ai_animation_timer >= ai_animation_delay and ai_solution_index < len(ai_solution):
@@ -101,6 +135,5 @@ def run_solo_game(initial_state, astar_solver_func):
             elif ai_solution_index >= len(ai_solution):
                 ai_solving = False
                 player_time_running = False
-
 
         pygame.display.flip()
