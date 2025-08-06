@@ -31,13 +31,13 @@ def run_menu():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if play_solo_button.collidepoint(event.pos):
                     pygame.quit()
-                    return "solo"
+                    return "solo", None
                 elif ai_solver_button.collidepoint(event.pos):
                     pygame.quit()
-                    return "ai"
+                    return "ai", None
                 elif settings_button.collidepoint(event.pos):
-                    run_settings_menu()
-                    return "settings"
+                    path = run_settings_menu()
+                    return "settings", path
 
         # Draw buttons
         pygame.draw.rect(screen, (70, 130, 180), play_solo_button)
@@ -77,6 +77,7 @@ def run_settings_menu():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if select_level_button.collidepoint(event.pos):
                     selected = level_selector()
+                    print(selected)
                     return selected  # Return the selected level
                 elif change_theme_button.collidepoint(event.pos):
                     print("Change Theme clicked")
@@ -139,14 +140,25 @@ def level_selector():
                     max_scroll = max(0, (len(level_files) - max_visible_rows) * (row_height + padding))
                     scroll_offset = min(max_scroll, scroll_offset + scroll_speed)
 
+        # Draw title
+        title_font = pygame.font.SysFont(None, 36)
+        title_text = title_font.render("Select Level:", True, (255, 255, 255))
+        title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 20))
+        screen.blit(title_text, title_rect)
+
         # Draw level list
+        rect_width = 300
+        rect_x = (SCREEN_WIDTH - rect_width) // 2
+
         for i, level_file in enumerate(level_files):
             y = 50 + i * (row_height + padding) - scroll_offset
-            if -row_height < y < SCREEN_HEIGHT:  # Only draw items within range
-                rect = pygame.Rect(50, y, 500, row_height)
+            if -row_height < y < SCREEN_HEIGHT:
+                rect = pygame.Rect(rect_x, y, rect_width, row_height)
                 pygame.draw.rect(screen, (100, 100, 100), rect)
+
                 text = font.render(level_file, True, (255, 255, 255))
-                screen.blit(text, (60, y + 5))
+                text_rect = text.get_rect(center=rect.center)
+                screen.blit(text, text_rect)
 
         pygame.display.flip()
         clock.tick(60)
