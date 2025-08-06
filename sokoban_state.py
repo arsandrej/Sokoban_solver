@@ -24,7 +24,6 @@ class SokobanState:
         self.heuristic_type = heuristic_type
         self.dead_squares = ()
         self.compute_dead_squares()
-        # self.print_dead_squares()
 
     def print_dead_squares(self):
         for y in range(self.height):
@@ -167,7 +166,7 @@ class SokobanState:
         new_state.dead_squares = self.dead_squares
         return new_state
 
-    def get_successors(self):
+    def get_successors(self, skip_deadlock_check=False):
         successors = []
 
         px, py = self.player
@@ -202,7 +201,7 @@ class SokobanState:
                     new_state.grid[by][bx] = "$"
                     new_state.player = (nx, ny)
                     new_state.boxes = new_state.find_boxes()
-                    if not new_state.is_deadlocked():
+                    if skip_deadlock_check or not new_state.is_deadlocked():
                         successors.append((direction, new_state))
 
         return successors
