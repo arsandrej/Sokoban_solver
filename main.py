@@ -8,7 +8,7 @@ from visualize import run_game
 from menu import run_menu
 from solo_game import run_solo_game
 
-level = load_level("levels/level8.txt")
+level = load_level("levels/level13.txt")
 
 choice = run_menu()
 if choice is None:

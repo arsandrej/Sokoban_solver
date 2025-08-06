@@ -81,9 +81,6 @@ class SokobanState:
             if(x, y) in self.goals:
                 continue
 
-            if (x, y) in self.boxes:
-                continue
-
             if self.is_corner(x,y):
                 self.dead_squares.add((x,y))
 
