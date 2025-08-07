@@ -101,12 +101,13 @@ def run_game(initial_state,
                     if event.key == pygame.K_ESCAPE:
                         running = False
                     elif event.key == pygame.K_r:  # Reset game
-                        current_state = initial_state
-                        animation_running = False
-                        animation_solution = ""
-                        animation_index = 0
-                        current_stats = None
-                        show_you_win = False
+                        return run_game(initial_state, astar_solution, astar_stats, bfs_solution, bfs_stats, dfs_solution, dfs_stats)
+                        # current_state = initial_state
+                        # animation_running = False
+                        # animation_solution = ""
+                        # animation_index = 0
+                        # current_stats = None
+                        # show_you_win = False
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if speed_button_rect.collidepoint(event.pos):
@@ -175,3 +176,4 @@ def run_game(initial_state,
         pygame.display.flip()
 
     pygame.quit()
+    return None
