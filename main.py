@@ -48,7 +48,3 @@ while True:
         if path is not None:
             level = load_level(path)
         initial_state = SokobanState(level)
-
-
-
-

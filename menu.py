@@ -1,11 +1,16 @@
 import pygame
 import os
+import re
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 BUTTON_WIDTH = 200
 BUTTON_HEIGHT = 80
 FONT_SIZE = 36
+
+def extract_number(filename):
+    match = re.search(r'\d+', filename)
+    return int(match.group()) if match else float('inf')
 
 def run_menu():
     pygame.init()
@@ -26,7 +31,7 @@ def run_menu():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                return None  # User closed window
+                return None, None  # User closed window
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if play_solo_button.collidepoint(event.pos):
@@ -150,7 +155,9 @@ def level_selector():
         rect_width = 300
         rect_x = (SCREEN_WIDTH - rect_width) // 2
 
-        for i, level_file in enumerate(level_files):
+        sorted_levels = sorted(level_files, key=extract_number)
+
+        for i, level_file in enumerate(sorted_levels):
             y = 50 + i * (row_height + padding) - scroll_offset
             if -row_height < y < SCREEN_HEIGHT:
                 rect = pygame.Rect(rect_x, y, rect_width, row_height)
