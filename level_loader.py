@@ -6,15 +6,15 @@ def load_level(file_path):
         lines = [line.rstrip('\n') for line in f]
     return lines
 
-def load_images():
-    base_path = "images"
+def load_images(theme="blue"):
+    base_path = os.path.join("images", theme)
     return {
-        "wall": pygame.image.load(os.path.join(base_path, "wall.png")),
+        "wall": pygame.image.load(os.path.join("images", "wall.png")),
         "goal": pygame.image.load(os.path.join(base_path, "goal.png")),
-        "box": pygame.image.load(os.path.join(base_path, "box.png")),
+        "box": pygame.image.load(os.path.join("images", "box.png")),
         "box_on_goal": pygame.image.load(os.path.join(base_path, "box_on_goal.png")),
-        "player": pygame.image.load(os.path.join(base_path, "player.png")),
-        "floor": pygame.image.load(os.path.join(base_path, "floor.png")),
+        "player": pygame.image.load(os.path.join("images", "player.png")),
+        "floor": pygame.image.load(os.path.join("images", "floor.png")),
     }
 
 

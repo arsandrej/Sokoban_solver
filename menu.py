@@ -109,6 +109,7 @@ def level_selector():
     clock = pygame.time.Clock()
 
     level_files = [f for f in os.listdir("levels") if f.endswith(".txt")]
+    level_files = sorted(level_files, key=extract_number)
     row_height = 28
     padding = 5
     scroll_offset = 0
@@ -155,9 +156,8 @@ def level_selector():
         rect_width = 300
         rect_x = (SCREEN_WIDTH - rect_width) // 2
 
-        sorted_levels = sorted(level_files, key=extract_number)
 
-        for i, level_file in enumerate(sorted_levels):
+        for i, level_file in enumerate(level_files):
             y = 50 + i * (row_height + padding) - scroll_offset
             if -row_height < y < SCREEN_HEIGHT:
                 rect = pygame.Rect(rect_x, y, rect_width, row_height)
