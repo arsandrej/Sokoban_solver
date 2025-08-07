@@ -1,4 +1,3 @@
-import pygame
 import time
 from level_loader import load_images
 from state_display import *
@@ -56,13 +55,15 @@ def run_solo_game(initial_state, astar_solver_func):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                return
+                return None
 
             if waiting_for_input:
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_m:
+                        return "Menu"
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
-                        return
+                        return None
                     elif event.key == pygame.K_r:  # Reset game after win
                         current_state = initial_state.clone()
                         move_stack.clear()
@@ -82,7 +83,7 @@ def run_solo_game(initial_state, astar_solver_func):
             elif event.type == pygame.KEYDOWN and not ai_solving and not waiting_for_input:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
-                    return
+                    return None
 
                 if event.key == pygame.K_r and ai_failed_to_solve:
                     current_state = initial_state.clone()

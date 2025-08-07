@@ -96,6 +96,8 @@ def run_game(initial_state,
                 running = False
             if show_you_win:
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_m:
+                        return "Menu"
                     if event.key == pygame.K_ESCAPE:
                         running = False
                     elif event.key == pygame.K_r:  # Reset game
