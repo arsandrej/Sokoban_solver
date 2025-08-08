@@ -8,7 +8,7 @@ from visualize import run_game
 from menu import run_menu
 from solo_game import run_solo_game
 
-level = load_level("levels/level1.txt")
+level = load_level("levels/level12.txt")
 
 choice, path = run_menu()
 if choice is None:
@@ -18,7 +18,7 @@ if path is not None:
     level = load_level(path)
 
 initial_state = SokobanState(level)
-# initial_state.print_dead_squares()
+initial_state.print_dead_squares()
 
 while True:
     if choice == "solo":

@@ -87,6 +87,85 @@ class SokobanState:
             if self.is_tunnel_deadlock(x, y):
                 self.dead_squares.add((x,y))
 
+            if self.wall_deadlock(x,y):
+                self.dead_squares.add((x,y))
+
+    def wall_deadlock(self, x, y):
+        # Check all four sides to see if the square touches a wall and can be pushed away from it
+        if self.is_wall(x + 1, y):
+            if self._check_wall_line(x + 1, y, vertical=True):
+                if not self._can_push_along_wall(x, y, wall_side='right'):
+                    return True
+
+        if self.is_wall(x - 1, y):
+            if self._check_wall_line(x - 1, y, vertical=True):
+                if not self._can_push_along_wall(x, y, wall_side='left'):
+                    return True
+
+        if self.is_wall(x, y + 1):
+            if self._check_wall_line(x, y + 1, vertical=False):
+                if not self._can_push_along_wall(x, y, wall_side='bottom'):
+                    return True
+
+        if self.is_wall(x, y - 1):
+            if self._check_wall_line(x, y - 1, vertical=False):
+                if not self._can_push_along_wall(x, y, wall_side='top'):
+                    return True
+
+        return False
+
+    def _check_wall_line(self, wall_x, wall_y, vertical):
+
+        # Determine scan direction along the wall line (perpendicular to wall)
+        if vertical:
+            for offset in range(-self.height, self.height):
+                ny = wall_y + offset
+                if not self.is_inside_bounds(wall_x, ny):
+                    continue
+
+                # If there's a gap then box can be pushed from that position
+                if not self.is_wall(wall_x, ny):
+                    return False
+
+                # If there is a goal adjacent to the wall line no deadlock
+                if (wall_x - 1, ny) in self.goals or (wall_x + 1, ny) in self.goals:
+                    return False
+
+        else:
+            for offset in range(-self.width, self.width):
+                nx = wall_x + offset
+                if not self.is_inside_bounds(nx, wall_y):
+                    continue
+
+                if not self.is_wall(nx, wall_y):
+                    return False
+
+                if (nx, wall_y - 1) in self.goals or (nx, wall_y + 1) in self.goals:
+                    return False
+
+        return True # return True if wall is continuous along entire line
+
+    def _can_push_along_wall(self, x, y, wall_side):
+        if wall_side in ('left', 'right'): #Vertical vs hroizontal directional pushes
+            push_dirs = [(-1, 0), (1, 0)]
+        else:
+            push_dirs = [(0, -1), (0, 1)]
+
+        for dx, dy in push_dirs:
+
+            px, py = x - dx, y - dy # player must stand at (x - dx, y - dy) to be able to push the box
+            bx, by = x + dx, y + dy # box moves to (x + dx, y + dy) after player
+
+            if not self.is_inside_bounds(px, py) or not self.is_inside_bounds(bx, by):
+                continue
+
+            # To push, player pos must not be in position of a wall or box, and box destination must be free
+            if (not self.is_wall(px, py) and (px, py) not in self.boxes and
+                    not self.is_wall(bx, by)):
+                return True
+
+        return False
+
     def is_tunnel_deadlock(self, x, y):
         # Count available directions
         exits = 0
