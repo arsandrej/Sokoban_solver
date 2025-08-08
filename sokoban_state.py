@@ -266,7 +266,7 @@ class SokobanState:
                 successors.append((direction, new_state))
 
             # Move in box direction
-            elif target == "$":
+            elif target in "$*":
                 if not self.is_inside_bounds(bx, by):
                     continue
                 beyond = self.grid[by][bx]

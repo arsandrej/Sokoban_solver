@@ -8,7 +8,7 @@ from visualize import run_game
 from menu import run_menu
 from solo_game import run_solo_game
 
-level = load_level("levels/level12.txt")
+level = load_level("levels/level15.txt")
 
 choice, path = run_menu()
 if choice is None:
@@ -29,6 +29,7 @@ while True:
         if path is not None:
             level = load_level(path)
         initial_state = SokobanState(level)
+        initial_state.print_dead_squares()
 
     elif choice == "ai":
         astar_solution, astar_stats = run_solver("A*", astar_solver, initial_state)
@@ -41,7 +42,7 @@ while True:
         if path is not None:
             level = load_level(path)
         initial_state = SokobanState(level)
-
+        initial_state.print_dead_squares()
 
     elif choice == "settings":
         choice, path = run_menu()
