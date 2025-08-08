@@ -1,4 +1,3 @@
-import pygame
 from level_loader import load_images
 from state_display import *
 from you_win import you_win
@@ -8,6 +7,7 @@ def run_game(initial_state,
              bfs_solution, bfs_stats,
              dfs_solution, dfs_stats):
     current_stats = None
+    ai_failed_to_solve = False
 
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -108,6 +108,13 @@ def run_game(initial_state,
                         # animation_index = 0
                         # current_stats = None
                         # show_you_win = False
+            elif ai_failed_to_solve:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_m:
+                        return "Menu"
+                    elif event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        return None
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if speed_button_rect.collidepoint(event.pos):
@@ -115,34 +122,59 @@ def run_game(initial_state,
                     animation_delay = base_ai_delay // 2 if ai_speed_fast else base_ai_delay
 
                 if buttons["A*"].collidepoint(event.pos):
-                    current_stats = astar_stats
-                    animation_solution = astar_solution
-                    animation_running = True
-                    animation_index = 0
-                    current_state = initial_state
-                    animation_timer = 0
+                    if astar_solution is None:
+                        ai_failed_to_solve = True
+                    else:
+                        current_stats = astar_stats
+                        animation_solution = astar_solution
+                        animation_running = True
+                        animation_index = 0
+                        current_state = initial_state
+                        animation_timer = 0
+                        ai_failed_to_solve = False
 
                 elif buttons["BFS"].collidepoint(event.pos):
-                    current_stats = bfs_stats
-                    animation_solution = bfs_solution
-                    animation_running = True
-                    animation_index = 0
-                    current_state = initial_state
-                    animation_timer = 0
+                    if bfs_solution is None:
+                        ai_failed_to_solve = True
+                    else:
+                        current_stats = bfs_stats
+                        animation_solution = bfs_solution
+                        animation_running = True
+                        animation_index = 0
+                        current_state = initial_state
+                        animation_timer = 0
+                        ai_failed_to_solve = False
 
                 elif buttons["DFS"].collidepoint(event.pos):
-                    current_stats = dfs_stats
-                    animation_solution = dfs_solution
-                    animation_running = True
-                    animation_index = 0
-                    current_state = initial_state
-                    animation_timer = 0
+                    if dfs_solution is None:
+                        ai_failed_to_solve = True
+                    else:
+                        current_stats = dfs_stats
+                        animation_solution = dfs_solution
+                        animation_running = True
+                        animation_index = 0
+                        current_state = initial_state
+                        animation_timer = 0
+                        ai_failed_to_solve = False
 
         # Draw everything
 
         screen.fill((0, 0, 0))
 
-        if not show_you_win:
+        if ai_failed_to_solve:
+            popup_w, popup_h = 400, 120
+            popup_x = (SCREEN_WIDTH - popup_w) // 2
+            popup_y = (SCREEN_HEIGHT - popup_h) // 2
+            pygame.draw.rect(screen, (30, 30, 30), (popup_x, popup_y, popup_w, popup_h))
+            pygame.draw.rect(screen, (255, 255, 0), (popup_x, popup_y, popup_w, popup_h), 4)
+
+            warning_text = font.render("Can't be solved!", True, (255, 255, 0))
+            instr_text = font.render("Press ESC to quit or M to return to menu", True, (255, 255, 255))
+            screen.blit(warning_text, warning_text.get_rect(center=(SCREEN_WIDTH // 2, popup_y + 40)))
+            screen.blit(instr_text, instr_text.get_rect(center=(SCREEN_WIDTH // 2, popup_y + 80)))
+
+
+        elif not show_you_win:
             draw_state(screen, current_state, images, offset_x=offset_x, offset_y=offset_y)
             draw_buttons()
             draw_stats()
