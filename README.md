@@ -38,7 +38,7 @@ The aim of this project is to:
 - **Solution playback** with adjustable animation speed.
 
 ### 🎮 Game Modes
-- **Play Solo**: Manual gameplay with undo/reset.
-- **AI Solver**: Watch and compare AI solver performances.
+- **Play Solo**: Manual gameplay with undo/reset, and Ai solver in case you get stuck.
+- **AI Solver**: Watch and compare AI solver performances(Explored nodes, steps, time).
 - **Settings Menu**: Choose themes, Select Different levels.
 
