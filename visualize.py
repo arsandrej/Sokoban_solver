@@ -5,7 +5,8 @@ from you_win import you_win
 def run_game(initial_state,
              astar_solution, astar_stats,
              bfs_solution, bfs_stats,
-             dfs_solution, dfs_stats):
+             dfs_solution, dfs_stats,
+             theme):
     current_stats = None
     ai_failed_to_solve = False
 
@@ -14,7 +15,7 @@ def run_game(initial_state,
     pygame.display.set_caption("Sokoban Solver Visualization")
 
     font = pygame.font.SysFont(None, FONT_SIZE)
-    images = load_images()
+    images = load_images(theme)
 
     buttons = {
         "A*": pygame.Rect(10, SCREEN_HEIGHT - BUTTON_HEIGHT - 10, 80, BUTTON_HEIGHT),

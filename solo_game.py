@@ -3,7 +3,7 @@ from level_loader import load_images
 from state_display import *
 from you_win import you_win
 
-def run_solo_game(initial_state, astar_solver_func):
+def run_solo_game(initial_state, astar_solver_func, theme):
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Sokoban Solo Play")
@@ -11,7 +11,7 @@ def run_solo_game(initial_state, astar_solver_func):
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(None, FONT_SIZE)
 
-    images = load_images()
+    images = load_images(theme)
     offset_x = (SCREEN_WIDTH - initial_state.width * TILE_SIZE) // 2
     offset_y = (SCREEN_HEIGHT - initial_state.height * TILE_SIZE - 60) // 2
 
