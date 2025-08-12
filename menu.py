@@ -1,6 +1,7 @@
 import pygame
 import os
 import re
+from stats_analysis import statistics
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -26,6 +27,7 @@ def run_menu():
     play_solo_button = pygame.Rect((SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, 120), (BUTTON_WIDTH, BUTTON_HEIGHT))
     ai_solver_button = pygame.Rect((SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, 240), (BUTTON_WIDTH, BUTTON_HEIGHT))
     settings_button = pygame.Rect((SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, 360), (BUTTON_WIDTH, BUTTON_HEIGHT))
+    stats_button = pygame.Rect((SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, 480), (BUTTON_WIDTH, BUTTON_HEIGHT))
 
     running = True
     while running:
@@ -46,20 +48,25 @@ def run_menu():
                 elif settings_button.collidepoint(event.pos):
                     path = run_settings_menu()
                     return "settings", path, THEME
+                elif stats_button.collidepoint(event.pos):
+                    statistics()
 
         # Draw buttons
         pygame.draw.rect(screen, (70, 130, 180), play_solo_button)
         pygame.draw.rect(screen, (180, 70, 70), ai_solver_button)
         pygame.draw.rect(screen, (100, 100, 180), settings_button)
+        pygame.draw.rect(screen, (255,64,0), stats_button)
 
         # Draw button text
         play_text = font.render("Play Solo", True, (255, 255, 255))
         ai_text = font.render("AI Solver", True, (255, 255, 255))
         settings_text = font.render("Settings", True, (255, 255, 255))
+        stats_text = font.render("Statistics", True, (255, 255, 255))
 
         screen.blit(play_text, play_text.get_rect(center=play_solo_button.center))
         screen.blit(ai_text, ai_text.get_rect(center=ai_solver_button.center))
         screen.blit(settings_text, settings_text.get_rect(center=settings_button.center))
+        screen.blit(stats_text, stats_text.get_rect(center=stats_button.center))
 
         pygame.display.flip()
         clock.tick(60)
