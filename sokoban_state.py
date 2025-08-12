@@ -1,7 +1,6 @@
 from scipy.optimize import linear_sum_assignment
 import numpy as np
 import math
-from collections import deque
 
 DIRECTIONS = {
     'U': (0, -1),

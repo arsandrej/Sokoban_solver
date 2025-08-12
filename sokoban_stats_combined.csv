@@ -1,0 +1,91 @@
+level,level_num,algorithm,time_s,explored_nodes,steps,deadlock_checked
+level1,1,A* Search,0.0035,3,2,No
+level1,1,A* Search,0.0035,3,2,Yes
+level1,1,BFS,0.0048,10,2,No
+level1,1,BFS,0.0089,10,2,Yes
+level1,1,DFS,0.0706,196,4,No
+level1,1,DFS,0.0201,42,4,Yes
+level2,2,A* Search,0.0714,40,7,No
+level2,2,A* Search,0.0579,40,7,Yes
+level2,2,BFS,0.6328,650,7,No
+level2,2,BFS,0.5668,418,7,Yes
+level2,2,DFS,19.9903,22212,599,No
+level2,2,DFS,1.6045,1276,599,Yes
+level3,3,A* Search,17.9636,27030,37,No
+level3,3,A* Search,5.0004,6906,37,Yes
+level3,3,BFS,170.7219,271709,37,No
+level3,3,BFS,20.6222,33166,37,Yes
+level3,3,DFS,186.2358,289014,361,No
+level3,3,DFS,5.3264,7843,361,Yes
+level4,4,A* Search,0.8532,1503,18,No
+level4,4,A* Search,0.2374,407,18,Yes
+level4,4,BFS,6.6558,15238,18,No
+level4,4,BFS,0.8331,1899,18,Yes
+level4,4,DFS,10.6707,23726,636,No
+level4,4,DFS,0.8076,1552,636,Yes
+level5,5,A* Search,2.7781,5294,78,No
+level5,5,A* Search,0.8472,1562,78,Yes
+level5,5,BFS,2.6814,5436,78,No
+level5,5,BFS,0.989,1582,78,Yes
+level5,5,DFS,1.9727,3853,154,No
+level5,5,DFS,0.35,683,154,Yes
+level6,6,A* Search,1.053,2022,49,No
+level6,6,A* Search,0.1731,304,49,Yes
+level6,6,BFS,1.0038,2510,49,No
+level6,6,BFS,0.1647,345,49,Yes
+level6,6,DFS,1.0914,2136,51,No
+level6,6,DFS,0.098,205,51,Yes
+level7,7,A* Search,4.8277,13416,52,No
+level7,7,A* Search,1.2175,2902,52,Yes
+level7,7,BFS,6.3556,17542,52,No
+level7,7,BFS,1.6019,4259,52,Yes
+level7,7,DFS,5.38,14896,257,No
+level7,7,DFS,0.7902,2069,257,Yes
+level8,8,A* Search,56.359,88872,100,No
+level8,8,A* Search,21.9498,34784,100,Yes
+level8,8,BFS,52.6933,90058,100,No
+level8,8,BFS,20.7809,35379,100,Yes
+level8,8,DFS,40.8439,65923,426,No
+level8,8,DFS,10.1073,17861,426,Yes
+level9,9,A* Search,2.2562,3540,27,No
+level9,9,A* Search,1.1353,1545,27,Yes
+level9,9,BFS,18.6517,29842,27,No
+level9,9,BFS,3.5592,6186,27,Yes
+level9,9,DFS,33.6052,53835,247,No
+level9,9,DFS,3.2078,4754,247,Yes
+level10,10,A* Search,12.6683,21281,42,No
+level10,10,A* Search,4.467,6474,42,Yes
+level10,10,BFS,30.0086,51908,42,No
+level10,10,BFS,9.7946,15673,42,Yes
+level10,10,DFS,25.2553,42132,300,No
+level10,10,DFS,5.4739,8754,300,Yes
+level11,11,A* Search,163.4925,216876,49,No
+level11,11,A* Search,48.161,66933,49,Yes
+level11,11,BFS,403.0176,564607,49,No
+level11,11,BFS,109.5842,153457,49,Yes
+level11,11,DFS,160.6758,227944,517,No
+level11,11,DFS,17.4605,25816,517,Yes
+level12,12,A* Search,528.1534,590098,65,No
+level12,12,A* Search,84.0513,190959,65,Yes
+level12,12,BFS,1533.4391,1783229,65,No
+level12,12,BFS,205.1803,474572,65,Yes
+level12,12,DFS,655.4323,751502,873,No
+level12,12,DFS,19.2919,45647,873,Yes
+level13,13,A* Search,11.9274,20641,42,No
+level13,13,A* Search,5.7046,10312,42,Yes
+level13,13,BFS,22.5581,44333,42,No
+level13,13,BFS,10.9216,18789,42,Yes
+level13,13,DFS,9.5922,19559,452,No
+level13,13,DFS,4.1431,7576,452,Yes
+level14,14,A* Search,5.7517,13949,59,No
+level14,14,A* Search,1.3315,3187,59,Yes
+level14,14,BFS,5.6891,14227,59,No
+level14,14,BFS,1.3058,3295,59,Yes
+level14,14,DFS,3.5589,9591,101,No
+level14,14,DFS,0.4833,1508,101,Yes
+level15,15,A* Search,3.3235,7342,33,No
+level15,15,A* Search,0.8471,1905,33,Yes
+level15,15,BFS,7.2257,18309,33,No
+level15,15,BFS,1.0259,2733,33,Yes
+level15,15,DFS,15.7,42642,61,No
+level15,15,DFS,1.7284,4813,61,Yes
