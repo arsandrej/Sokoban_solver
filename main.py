@@ -52,3 +52,6 @@ while True:
         if path is not None:
             level = load_level(path)
         initial_state = SokobanState(level)
+
+    elif choice == "quit":
+        break

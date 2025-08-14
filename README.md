@@ -128,7 +128,7 @@ sokoban_solver/
 ├── level_loader.py          # Level loading and simple main functions
 ├── visualize.py             # AI algorithm solution representation
 ├── solo_game.py             # An option for playing the game solo 
-├── stats_analysis.py        # Simple statistics provided from the AI solvers
+├── stats_analysis.py        # Statistics provided from the AI solvers
 ├── state_display.py         # Provides image and grid maping for display
 ├── you_win.py               # Game loop and menu handling     
 ```

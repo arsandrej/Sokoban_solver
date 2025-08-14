@@ -1,7 +1,7 @@
 import pygame
 import os
 import re
-from stats_analysis import statistics
+from stats_analysis import statistics, visualize_statistics
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -49,7 +49,11 @@ def run_menu():
                     path = run_settings_menu()
                     return "settings", path, THEME
                 elif stats_button.collidepoint(event.pos):
-                    statistics()
+                    # statistics()
+                    res = visualize_statistics()
+                    if res == "quit":
+                        return res, None, None
+                    return run_menu()
 
         # Draw buttons
         pygame.draw.rect(screen, (70, 130, 180), play_solo_button)
