@@ -143,7 +143,7 @@ sokoban_solver/
 ├── solo_game.py             # An option for playing the game solo 
 ├── stats_analysis.py        # Statistics provided from the AI solvers
 ├── state_display.py         # Provides image and grid maping for display
-├── you_win.py               # Game loop and menu handling     
+├── you_win.py               # Simple display on Win   
 ```
 
 ---
