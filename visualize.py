@@ -102,7 +102,7 @@ def run_game(initial_state,
                     if event.key == pygame.K_ESCAPE:
                         running = False
                     elif event.key == pygame.K_r:  # Reset game
-                        return run_game(initial_state, astar_solution, astar_stats, bfs_solution, bfs_stats, dfs_solution, dfs_stats)
+                        return run_game(initial_state, astar_solution, astar_stats, bfs_solution, bfs_stats, dfs_solution, dfs_stats,theme)
                         # current_state = initial_state
                         # animation_running = False
                         # animation_solution = ""

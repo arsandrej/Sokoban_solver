@@ -103,6 +103,9 @@ def run_settings_menu():
                 elif change_theme_button.collidepoint(event.pos):
                     new_theme = change_theme()
                     THEME = new_theme
+                    if new_theme is None:
+                        THEME = "blue"
+                        new_theme = "didnt work"
                     print(f"Change Theme clicked THEME: {THEME}")
                     print(f"Change Theme clicked new_theme: {new_theme}")
                     return None
@@ -186,7 +189,7 @@ def level_selector():
             y = 50 + i * (row_height + padding) - scroll_offset
             if -row_height < y < SCREEN_HEIGHT:
                 rect = pygame.Rect(rect_x, y, rect_width, row_height)
-                pygame.draw.rect(screen, (100, 100, 100), rect)
+                pygame.draw.rect(screen, (70, 130, 180), rect)
 
                 text = font.render(level_file, True, (255, 255, 255))
                 text_rect = text.get_rect(center=rect.center)
