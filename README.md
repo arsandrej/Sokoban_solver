@@ -91,22 +91,17 @@ All solvers share a **push-based successor generator**:
 
 The heuristics are **admissible**, ensuring **A*** finds optimal solutions.
 
-### **Deadlock Functions**
-Each deadlock detector operates with minimal overhead:
-- **Corner**: Checks for two perpendicular walls around a box.
-- **Wall**: Precomputes goal-aligned wall sections and checks box alignment.
-- **Tunnel**: Uses map preprocessing to find 1-tile wide passages without goals.
-- **Freeze**: Uses connected-component detection to see if a cluster has no legal moves.
-- **Dead Squares**: Precomputed using reverse BFS from goals (pull model).
-
 ---
 
 ## Graphics & UI
-- Built with **Pygame**.
-- Four themes: blue, red, brown, gray.
-- Visual playback of AI solutions with adjustable animation speed.
-- Manual gameplay with undo/reset and optional AI assistance.
-
+- ### Built with **Pygame**.
+![menu_image.png](images/menu_image.png)
+- ### Four themes: blue, red, brown, gray.
+![theme_image.png](images/theme_image.png)
+- ### Visual playback of AI solutions with adjustable animation speed.
+![Animation.gif](images/Animation.gif)
+- ### Manual gameplay with undo/reset and optional AI assistance.
+![image.png](images/image.png)
 ---
 
 ##  Game Modes
