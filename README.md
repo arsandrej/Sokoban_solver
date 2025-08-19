@@ -1,9 +1,24 @@
-# Sokoban Solver with AI & Graphical Interface
+## Introduction  
 
-A **Sokoban** puzzle game with both manual play and AI solvers, implemented in Python using **Pygame**.  
-This project features **deadlock detection**, multiple solving algorithms (**A***, **BFS**, **DFS**), solution visualization, and customizable themes.
+Welcome to the **Sokoban Solver with AI & Graphical Interface** — a project that combines the **classic Sokoban puzzle game** with **AI search algorithms**.  
+You can either play manually or watch algorithms like **A\***, **BFS**, and **DFS** solve puzzles step by step, with **deadlock detection**, **heuristics**, and **visual playback**.  
+
+This project is designed as both a **fun game** and an **AI research tool**, offering performance statistics, customizable themes, and a graphical interface built with **Pygame**.  
 
 ---
+
+## Table of Contents  
+
+- [Game Goal](#game-goal)  
+- [Project Goals](#project-goals)  
+- [Features](#features)  
+  - [AI Solvers](#ai-solvers)  
+  - [Deadlock Detection](#deadlock-detection)  
+- [State Representation](#state-representation)  
+- [Graphics & UI](#graphics--ui)  
+- [Game Modes](#game-modes)  
+- [Project Structure](#project-structure)  
+- [How to Run](#how-to-run)  
 
 ## Game Goal
 Sokoban is a classic puzzle game where a player pushes boxes onto designated goal squares inside a maze.
@@ -46,52 +61,51 @@ These checks are integrated directly into the **successor generation phase**, en
 
 ---
 
-## Technical Design
+## State Representation
 
-### **State Representation**
-Each state is modeled as:
-States are stored exactly as in the `SokobanState` class (coordinates are `(x, y)` where `x` is column and `y` is row):
+Each game state is stored in the `SokobanState` class. The board uses `(x, y)` coordinates, where `x` is the column and `y` is the row.
 
-```python
-# Core fields
-self.grid: List[List[str]]          # mutable board; characters '#', '@', '$', '.', '*', ' '
-self.player: Tuple[int, int]        # (x, y)
-self.boxes: Set[Tuple[int, int]]    # parsed from '$' and '*'
-self.goals: Set[Tuple[int, int]]    # parsed from '.' and '*'
-self.empty_spaces: Set[Tuple[int,int]]   # ' ' cells (used to precompute dead squares)
-self.dead_squares: Set[Tuple[int,int]]   # computed once from layout
+- **Grid (`grid`)** – The board layout as a 2D list of characters:
+  - `#` = wall  
+  - `@` = player  
+  - `$` = box  
+  - `.` = goal  
+  - `*` = box on goal  
+  - `' '` = empty space
+  
+  Example (level1.txt)
+```
+#######
+
+#.$ @ #
+
+#######
 ```
 
-- Walls and goals are parsed from `grid` at init. Walls are queried via `is_wall(x, y)`, while `goals` are kept as a separate set and overlaid during rendering.
-- Boxes are stored as a **mutable `set`**. An invariant ordering is applied **only for hashing/equality** by sorting the set, which keeps updates cheap while ensuring identical layouts hash the same.
-- Player coordinates are `(x, y)`.
 
+- **Player (`player`)** – The player’s current position `(x, y)`.
 
-**Hashing** is critical for detecting revisited states efficiently:
-```python
+- **Boxes (`boxes`)** – A set of coordinates for all boxes.
+
+- **Goals (`goals`)** – A set of coordinates for all goals.
+
+- **Empty Spaces (`empty_spaces`)** – All walkable tiles that are not walls.
+
+- **Dead Squares (`dead_squares`)** – Tiles where a box would get stuck and make the puzzle unsolvable.
+
+- **Hashing is critical for detecting revisited states efficiently:**
+```
     def __hash__(self):
         # Use sorted boxes for invariant state representation
         return hash((self.player, tuple(sorted(self.boxes))))
 ```
+- **Successor Generation**  
+  The `get_successors()` method creates new states by moving the player or pushing a box. It has options for skipping deadlocks in case of testing.
 
-### **Search Algorithm Framework**
-- **BFS**: Guaranteed to find the shortest solution but memory-heavy.
-- **DFS**: Memory-efficient but may get stuck in deep branches.
-- **A***: Uses heuristics to prioritize promising states; best choice for large levels.
+- **Deadlock Detection**  
+  Several checks (`corner`, `tunnel`, `wall`, `freeze`) are included to stop exploring impossible states early.
 
-All solvers share a **push-based successor generator**:
-- Compute player-reachable tiles without moving boxes.
-- For each reachable adjacent box, simulate a push if the target square is free and not a dead square.
-- Apply **deadlock checks** immediately after the push.
 
-### **Heuristic Design**
-1. **Manhattan Distance Sum** — lower bound on pushes required.
-2. **Euclidean Distance Sum** — cheaper alternative.
-3. **Hungarian Algorithm** — solves the optimal box-goal matching problem in O(n³) for tighter estimates.
-
-The heuristics are **admissible**, ensuring **A*** finds optimal solutions.
-
----
 
 ## Graphics & UI
 - ### Built with **Pygame**.
@@ -103,6 +117,10 @@ The heuristics are **admissible**, ensuring **A*** finds optimal solutions.
 - ### Manual gameplay with undo/reset and optional AI assistance.
 ![image.png](images/image.png)
 ---
+- ### Pre-calculated statistics per level.
+![image.png](images/image_statistics.png)
+![image.png](images/statistics_image.png)
+---
 
 ##  Game Modes
 1. **Manual Play** — Control the player yourself; undo mistakes.
@@ -111,7 +129,7 @@ The heuristics are **admissible**, ensuring **A*** finds optimal solutions.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 ```
 sokoban_solver/
 ├── levels/                  # Puzzle level files
@@ -129,7 +147,7 @@ sokoban_solver/
 ```
 
 ---
-## ▶️ How to Run
+## How to Run
 
 1. **Clone the repository**
 ```bash
